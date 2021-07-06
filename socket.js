@@ -11,7 +11,7 @@ var nanT, nanH, nanPPM, nanAvr, nanBMP;
 var socket = io();
 					
 
-  socket.on('connect', function(){
+  socket.on('connection', function(){
 	console.log("Conectado");
 	
 	//Materialize.toast('Connected!', 800);
