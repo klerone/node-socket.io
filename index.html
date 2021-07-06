@@ -1,17 +1,833 @@
-<html>
-  <head>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      let socket = io();
-      let el;
+<!DOCTYPE html>
+<html lang="es">
+<head>
 
-      socket.on('time', (timeString) => {
-        el = document.getElementById('server-time');
-        el.innerHTML = 'Server time: ' + timeString;
-      });
-    </script>
-  </head>
-  <body>
-    <p id="server-time"></p>
-  </body>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  
+  <!-- Apple meta tags --> 
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <!-- <link rel="apple-touch-startup-image" href="startup.png"> --> 
+  <link rel="apple-touch-icon" href="smart_haus_6.png">
+ 
+  
+  <!-- Android meta tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="shortcut icon" sizes="196x196" href="smart_haus_6.png"> 
+  <link rel="shortcut icon" sizes="128x128" href="smart_haus_6.png">
+  
+  <!-- Windows 8/10 meta tags 
+  <meta name="msapplication-TileImage" content="smart_haus_6.png"> 
+  <meta name="msapplication-TileColor" content="#FFFF00">
+  -->
+  
+  <meta name="description" content="">
+  <meta name="author" content="Francisco Calero">
+  <link rel="icon" href="smart_haus_6.png">
+  
+  <script src="/socket.io/socket.io.js"></script>
+   
+  <script src="jquery.min.js"></script>
+  <!--<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>-->
+  
+  <script type="text/javascript" src="/socket.js"></script>
+  
+
+  <!-- CSS  -->
+   <link href="css/wickedpicker.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <!-- Compiled and minified CSS
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+   -->
+ 
+ <!-- 	JustGauges -->
+  <script src="js/raphael-2.1.4.min.js"></script>
+  <script src="js/justgage.js"></script>  
+  <!-- <script src="http://cdn.jsdelivr.net/raphael/2.1.2/raphael-min.js"></script>
+  <script src="http://cdn.jsdelivr.net/justgage/1.0.1/justgage.min.js"></script> -->
+
+  <link href="js/nouislider.min.css" rel="stylesheet">
+  <script src="js/nouislider.min.js"></script>
+
+ 
+ 
+  <title>Sherry's Smart Home 2.0</title>
+  
+  <style>
+	.materialPicker{
+  width: 16rem;
+}
+
+.Number{
+  border: none;
+  text-align: center;
+  font-size: 4.1rem;
+  width: 6.4rem;
+}
+
+.pickerButton{
+    width:100%;
+}
+
+.first{
+  float:left;
+}
+.second{
+    float:right;
+}
+
+/** JustGauges **/
+/* clearfix */
+
+    .clear:before,
+    .clear:after {
+        content: "";
+        display: table;
+    }
+
+    .clear:after {
+        clear: both;
+    }
+
+    .clear {
+        *zoom: 1;
+    }
+
+    .wrapper {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: 30px;
+       // border: 1px solid #cccccc;
+    }
+
+    .gauge {
+        display: block;
+        float: left;
+    }
+
+    #gageH {
+        width: 100%;
+    }
+
+    #gaugeT {
+        width: 100%;
+    }
+
+    #gaugeBMP {
+        width: 100%;
+    }
+	
+    #gaugeHCHO {
+        width: 100%;
+    }
+    #gaugeCO {
+        width: 100%;
+    }
+  </style>
+
+</head>
+
+<body data-slug="Web/HTTP/Access_control_CORS">
+
+<div class="navbar-wrapper">
+  <nav class="orange" role="navigation">
+    <div class="nav-wrapper container">
+		<a id="logo-container" href="#" class="brand-logo">Sherry's Smart Home <small> <label id='wifiStatus'>wifi status</label> </small></a>
+    </div>
+  </nav>
+  </div>
+
+
+<div class="row">
+	<div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3"><a href="#sensores">Sensors</a></li> 
+        <li class="tab col s3"><a class="active" href="#controles">Smart Swith</a></li>
+        <li class="tab col s3"><a href="#config">Settings</a></li> 
+        <li class="tab col s3"><a href="#acerca">About</a></li>
+      </ul>
+    </div>
+
+
+
+
+<div id="sensores" >
+<div class="col s12">
+ <h5 class="orange-text">Home air quality monitoring system<small> and weather monitor too</small></h5>
+ <!--<p class="orange-text"> Also I will add here whatever come to my mind later or soon </p> -->
+
+
+<div class="row">
+	<div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3"><a href="#graficas">Graphics</a></li> 
+        <li class="tab col s3"><a class="active" href="#tablas">Tables</a></li>
+      </ul>
+    </div>
+	
+	<!-- JustGauges.com -->
+	<div id = "graficas" class="row "> 
+ 
+		<div class="grid-example col s6 m4 l3">
+			<div class="card" id="gageH" name="colorTheme"> </div>
+		</div>
+		<div class="grid-example col s6 m4 l3">			
+			<div class="card" id="gaugeT" name="colorTheme"> </div>
+		</div>
+		<div class="grid-example col s6 m4 l3">			
+			<div class="card" id="gaugeBMP" name="colorTheme"> </div>
+		</div>
+		<div class="grid-example col s6 m4 l3">			
+			<div class="card" id="gaugeHCHO" name="colorTheme"> </div>
+		</div>
+		<div class="grid-example col s6 m4 l3">			
+			<div class="card" id="gaugeCO2" name="colorTheme"> </div>
+		</div>
+		<div class="grid-example col s6 m4 l3">			
+			<div class="card" id="gaugeCO" name="colorTheme"> </div>
+		</div>
+
+	</div> 
+	<!-- final JustGauges.com -->
+	
+	<div id="tablas"> 
+		<div class="grid-example col s12 m6">
+			<div class="card" id="cardColor" name="colorTheme">
+				<div class="card-content">
+					<span class="card-title">Baby Bedroom</span>
+						
+					  <table class="bordered">
+					   <!-- <thead>
+						  <tr>
+							<th>Sensor</th>
+							<th>Lectura</th>
+							<th>Unidad</th>
+						  </tr>
+						</thead> -->
+						<tbody>
+						 <tr>
+							<td>Temperature</td>
+							<td id="valTempDHT"> cargando... </td>
+							<td>°C</td>
+						  </tr>
+						  <tr>
+							<td>Humidity</td>
+							<td id="valHumDHT"> cargando... </td>
+							<td>%</td>
+						  </tr>
+						  <tr>
+							<td>Atmospheric pressure</td>
+							<td id="valPatm"> cargando... </td>
+							<td>hPa</td>
+						  </tr>
+						  <tr>
+							<td>HCHO </td>
+							<td id="val_ppmHCHO"> cargando... </td>
+							<td>ppm</td>
+						  </tr>
+						  <!--<tr>
+							<td>HCHO average</td>
+							<td id="val_avrHCHO"> cargando... </td>
+							<td>ppm</td>
+						  </tr> -->
+						  <tr>
+							<td>HCHO</td>
+							<td id="val_mgHCHO"> cargando... </td>
+							<td>mg/m³</td>
+						  </tr>
+						  <tr>
+							<td>CO2</td>
+							<td id="val_CO2"> cargando... </td>
+							<td>%</td>
+						  </tr>
+						  <tr>
+							<td>CO2</td>
+							<td id="val_CO2ppm"> cargando... </td>
+							<td>ppm</td>
+						  </tr>
+						  <tr>
+							<td>CO</td>
+							<td id="CO_ppm"> cargando... </td>
+							<td>ppm</td>
+						  </tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Sensores exterior -->
+		<div class="grid-example col s12 m6">
+		   <div class="card"  name="colorTheme">
+				<div class="card-content">
+					<span class="card-title">Outside</span>
+					<table class="bordered">
+					 <tbody>
+					<!-- <tr>
+						<td>Temperatura Thermistor</td>
+						<td id="valThermistor_2"> cargando... </td>
+						<td>°C</td>
+					  </tr> -->
+					  <tr>
+						<td>Temperature </td>
+						<td id="tem_af"> cargando... </td>
+						<td>°C</td>
+					  </tr>
+					  <tr>
+						<td>Humidity</td>
+						<td id="hum_af"> cargando... </td>
+						<td>%</td>
+					  </tr>
+					 </tbody>
+					</table>
+			    </div>
+			</div>
+		</div>
+
+		<!-- Room 2 -->
+		<div class="grid-example col s12 m6">
+		   <div class="card"  name="colorTheme">
+				<div class="card-content">
+					<span class="card-title">Room 2</span>
+					<table class="bordered">
+					 <tbody>
+					<!-- <tr>
+						<td>Temperatura Thermistor</td>
+						<td id="valThermistor_2"> cargando... </td>
+						<td>°C</td>
+					  </tr> -->
+					  <tr>
+						<td>Temperatura </td>
+						<td id="tem_Room2"> cargando... </td>
+						<td>°C</td>
+					  </tr>
+					  <tr>
+						<td>Humedad</td>
+						<td id="hum_Room2"> cargando... </td>
+						<td>%</td>
+					  </tr>
+					 </tbody>
+					</table>
+			    </div>
+			</div>
+		</div>
+		
+		<!-- Living room -->
+		<div class="grid-example col s12 m6">
+		   <div class="card"  name="colorTheme">
+				<div class="card-content">
+					<span class="card-title">Living Room</span>
+					<table class="bordered">
+					 <tbody>
+					<!-- <tr>
+						<td>Temperatura Thermistor</td>
+						<td id="valThermistor_2"> cargando... </td>
+						<td>°C</td>
+					  </tr> -->
+					  <tr>
+						<td>Temperatura</td>
+						<td id="tem_Liv"> cargando... </td>
+						<td>°C</td>
+					  </tr>
+					  <tr>
+						<td>Humedad</td>
+						<td id="hum_Liv"> cargando... </td>
+						<td>%</td>
+					  </tr>
+					 </tbody>
+					</table>
+			    </div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+
+
+</div>
+</div> <!-- fin container Sensores -->
+</div> <!-- la acabo de hacer -->
+
+<div id="acerca">
+	<div class="row">
+      <div class="col s12 m8 offset-m2">
+        <div class="card"  name="colorTheme">
+			<div class="card-content">
+				<span class="card-title">The idea!</span>
+		
+				<p> 
+				The idea comes cause I feel lazy to go out of the bed to shut-off the lights in the bedroom before going to sleep. <br>
+
+				Then this idea become real after hard work, hard code of software, read tons of information, play with hardware and expend a lot of money to get the system work. <br>
+				</p>
+			
+				<p>
+				At this point the system is capable of control multiple smart switches, get sensors information, control air quality and more features are coming soon. <br>
+				<br>
+				Software Version: 2.0 <br>
+				Hardware Version: 1 Rev. 03 <br>
+				</p>
+				
+				<br>
+				
+				<p> Hardware and Software Solution fully developed by Francisco Calero, just for Fun. </p>
+			</div>
+		</div>
+		
+		<div class="card"  name="colorTheme">
+			<div class="card-content">
+				<span class="card-title">Security in Mind </span>
+		
+				<p>
+				Out there are many options to play with, but I freak out to find how much of my information is shared (stolen in many cases). <br>
+				So for that I developed my own solution wich makes me safe that nobody get my data, metada or usage records (not even me!). <br>
+				There are not records, time stamps or something related that can be used to track you down, the only store information is your APP settings wich is local store inside the APP, delete the APP and bye bye records that simple.
+				</p>
+			
+			</div>
+		</div>
+		
+		
+		<div class="card"  name="colorTheme">
+			<div class="card-content">
+				<span class="card-title">Get online</span>
+				<p>
+				Give you the freedom to choose. You can make it work over the internet using your own server, a free or paid service as www.no-ip.com at ease or can use in the safety of your private network setting alarms to auto control what you need.
+				<p>
+			</div>
+		</div>
+
+			
+			
+		<div class="card"  name="colorTheme">
+			<div class="card-content">
+				<span class="card-title">Contact me </span>
+			
+				<p> Francisco Calero. <br>
+					fran-dev@live.com <br>
+					francalero@live.com 
+				</p>
+			</div>
+		</div>
+      </div>
+    </div>
+
+</div> <!-- final div acerca-->
+
+
+	<!-- Switch -->
+<div id="controles">
+
+	<!-- <div class="row"> -->
+	
+      <div class="col s12">
+		<h5 class="orange-text">SMART DEVICES CONTROL PANEL</h5>
+		<p class="orange-text"> Turn ON and OFF Devices connected to the System<p>
+        <!--<p id='wifiStatus'>wifi status</p> -->
+		
+		<!-- Bedroom -->
+		<div class="grid-example col s12 m6">
+			<div class="card"  name="colorTheme">
+				<div class="card-content">
+					<span class="card-title">Smart Switch 1</span>
+					<label class="row" id="D1_status"> waiting status </label>
+				
+					<div class="switch row card-panel" name="colorTheme" >
+						<div class="col s4 m4 l2">
+							<label >
+								<input class="orange" id='toggle-1' type="checkbox">
+								<span class="lever"></span>	
+							</label>
+						</div>
+						
+						<p id='d12' contenteditable="true"  onblur="guardaEdit(this);" ></p>
+					</div>
+					
+					<label class="row" id='label_d1'>Device Temperature: 
+						<span id="tem_D1">waiting</span>
+						<span>°C</span>
+					</label>
+				</div>
+			</div>
+		</div>
+			
+		 <!-- Device 2 -->
+		 <div class="grid-example col s12 m6">
+			<div class="card"  name="colorTheme">
+				<div class="card-content">
+					<span class="card-title">Smart Switch 2</span>
+					<label class="row" id="D2_status"> waiting status </label>
+				
+					<div class="switch row card-panel" name="colorTheme">
+						 <div class="col s4 m4 l2">
+							<label>
+							<input id='toggle-3' type="checkbox">
+							<span class="lever"></span>
+								
+							</label>
+						</div>
+						
+						<p id='d22' contenteditable="true"  onblur="guardaEdit(this);">light on top of the bed</p>
+					</div>
+					<label class="row" id='label_d2'>Device Temperature: 
+						<span id="tem_D2">waiting</span>
+						<span>°C</span>
+					</label>
+				</div>
+			</div>
+		</div>
+
+	
+		<!-- Device 3 -->
+		<div class="grid-example col s12 m6" id="device3">
+			<div class="card" name="colorTheme">
+				<div class="card-content">
+					<span class="card-title">Smart Switch 3</span>
+					<label class="row" id="D3_status"> waiting status </label>
+				
+					<div class=" card-panel switch row" name="colorTheme">
+						<div class="col s4 m4 l2">
+							<label>
+								<input class="orange" id='toggle-5' type="checkbox">
+								<span class="lever"></span>
+							</label>
+						</div>
+						<span id='d3'>Smart Switch 3</span>
+						<label for="d3">Switch OFF/ON </label>
+					</div>
+					
+					<div class="row card-panel" name="colorTheme" id="hide_D3">
+						
+						<label class="row" for="d3_Set"> Set prefered temperature for</label> 
+						<span class="card-title col s6">Thermostat:</span> 
+						<span class="card-title col offset-s2" id="d3_Set"></span>
+						<span class="card-title">°C</span>
+						<div id="d3_slider" ></div>
+					</div>
+					
+					<label class="row" id='label_d3'>Actual Temperature: 
+						<span id="tem_D3">waiting</span>
+						<span>°C</span>
+					</label>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Device 4 -->
+		<div class="grid-example col s12 m6">
+			<div class="card" name="colorTheme">
+				<div class="card-content">
+					<span class="card-title">Smart Switch 4</span>
+					
+					<label class="row" id="D4_status"> waiting status </label>
+					
+					<div class="card-panel switch row" name="colorTheme">
+						<div class="col s4 m4 l2">
+							<label>
+								<input class="orange" id='toggle-7' type="checkbox">
+								<span class="lever"></span>
+							</label>
+						</div>
+						
+						<span id='d4'>Smart Switch 4</span>
+						<label for="d4">Switch OFF/ON </label>
+						
+					</div>
+					
+					<div class="row card-panel" name="colorTheme" id="hide_D4">
+						<label class="row" for="d4_Set"> Set prefered temperature for</label> 
+						<span class="card-title col s6">Thermostat:</span> 
+						<span class="card-title col offset-s2" id="d4_Set"></span>
+						<span class="card-title">°C</span>
+						
+						<div id="d4_slider" ></div>
+						
+					</div>
+					
+					<label class="row" id='label_d4'>Actual Temperature: 
+						<span id="tem_D4">waiting</span>
+						<span>°C</span>
+					</label>
+				</div>
+			</div>
+		</div>
+
+        </div>
+      
+    </div>
+	
+	
+
+
+</div> <!-- final div controles-->
+
+<div id="config" class="tab-pane fade">
+	<div class="row">
+      <div class="col s12 m8 offset-m2">
+		
+			<!--<div class="card " name="colorTheme">
+			
+				<div class="card-content">
+				  <span class="card-title">Connect</span>
+				  <p>Connect to Sherry's Smart Home controller.</p>
+				
+
+					<div class="input-field">
+						<input name="ipESP" type="text" id='device_address' class="validate">
+						<label for="device_address">Set controller IP address:</label>
+					</div>
+			
+					<div class="progress" id='barProg'>
+						<div class="indeterminate"></div>
+					</div>
+				</div>
+				<div class=" row card-action">
+					<div class="row">
+						<a class="btn waves-effect waves-light orange" id='conectar' onclick='mod()' ><i class="material-icons left">settings_ethernet</i>connect</a>
+						<div class="col s6  m6">
+							<input type="checkbox" class="filled-in " id="autoCon" />
+							<label for="autoCon">Auto connect</label>
+						</div>
+					</div>
+				</div>
+			</div> -->
+		
+			<!-- Color theme toggle -->
+			<div class="card" name="colorTheme">
+				<div class="card-content">
+				  <span class="card-title">Set color theme</span>
+				  <p>Switch between bright or dark color theme</p>
+				   
+				   <div class="switch row">
+						<div class="col s4 m3 l1">
+							<label>
+								<input class="orange" id='toggle-Theme' type="checkbox">
+								<span class="lever"></span>
+								
+							</label>
+						</div>
+						<p> Toggle Theme </p>
+					<div class="col s4">
+						<!--  <input  name="group1" type="radio" id="test3"  />
+						  <label for="test3"></label> -->
+					</div>
+				   </div>
+				</div>
+			</div>	
+		
+		
+			<div class="card" name="colorTheme">
+				<div class="card-content">
+				  <span class="card-title">Sync Time</span>
+				  <p>Sync Sherry's Smart Home controller time with your device.</p>
+				   <p id='la_Fecha'> </p>
+				   <p id='la_Hora'> </p>
+				</div>
+				
+				<div class="card-action">
+				  <a class="btn waves-effect waves-light orange" id='conectar' onclick='reloj()' ><i class="material-icons left">settings_ethernet</i>sync</a>
+				</div>
+			</div>
+		
+			<div class="card" name="colorTheme">
+				<div class="card-content materialPicker">
+				  <span class="card-title">Self control home</span>
+				  <p>Set alamrs to turn ON/OFF lights.</p>
+				   
+				  <!--<input type="text" name="timepicker" class="timepicker"/> -->
+				</div>    
+			</div>
+		
+			
+
+			<!-- Edita detalles de los dispositivos -->
+			<div class="card" name="colorTheme" name="colorTheme">
+				<div class="card-content" >
+				  <span class="card-title" name="colorTheme">Edit connected devices</span>
+				   
+						<ul class="collapsible" data-collapsible="accordion" name="colorTheme">
+							<li> <!-- Device 1 -->
+								<div class="collapsible-header" name="colorTheme"><i class="material-icons">mode_edit</i>Edit device 1</div>
+								<div class="collapsible-body"><span>
+									<div class="card-panel" name="colorTheme">
+										<span class="card-title" >Smart Switch 1</span>
+										<div class="row">
+											<div class="input-field">
+											  <input value="Swith 1" id='d1_name'  class="validate">
+											  <label class="active" for="d1_name">user defined name</label>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="input-field">
+											  <input value="0xa12" id='d1_uid' type="text" class="validate">
+											  <label class="active" for="d1_uid">Device Unique ID</label>
+											</div>
+										</div>
+										
+										<a class="btn waves-effect waves-light orange" id='conectar' 
+										   onclick="socket.emit('editar_D', JSON.stringify({'toggle': 'toggle-1','name': $('#d1_name').val(), 'uid' : $('#d1_uid').val(), 'type': 'ESP-01'}));">
+										   <i class="material-icons left">done</i>APPLY
+										</a>
+										<a class="btn waves-effect waves-light orange"  onclick='' ><i class="material-icons left">clear</i>CANCEL</a>
+									
+									</div>
+								</span></div>
+							</li>
+							
+							<li> <!-- Device 2 -->
+								<div class="collapsible-header" name="colorTheme"><i class="material-icons">mode_edit</i>Edit device 2</div>
+								<div class="collapsible-body"><span>
+									<div class="card-panel" name="colorTheme">
+										<span class="card-title">Smart Switch 2</span>
+										<div class="row">
+											<div class="input-field">
+											  <input value="Swith 2" id="d2_name" type="text" class="validate">
+											  <label class="active" for="d2_name">user defined name</label>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="input-field">
+											  <input value="0xa12" id="d2_uid" type="text" class="validate">
+											  <label class="active" for="d2_uid">Device Unique ID</label>
+											</div>
+										</div>
+										
+										<a class="btn waves-effect waves-light orange" id='conectar' 
+										   onclick="socket.emit('editar_D', JSON.stringify({'toggle': 'toggle-3','name': $('#d2_name').val(), 'uid' : $('#d2_uid').val(), 'type': 'ESP-01'}));">
+										   <i class="material-icons left">done</i>APPLY
+										</a>
+										<a class="btn waves-effect waves-light orange" onclick='' ><i class="material-icons left">clear</i>CANCEL</a>
+									
+									</div>
+								</span></div>
+							</li>
+							
+							<li> <!-- Device 3 -->
+								<div class="collapsible-header" name="colorTheme"><i class="material-icons">mode_edit</i>Edit device 3</div>
+								<div class="collapsible-body"><span>
+									<div class="card-panel" name="colorTheme">
+										<span class="card-title">Smart Switch 3</span>
+										<div class="row">
+											<div class="input-field">
+											  <input value="Swith 3" id="d3_name" type="text" class="validate">
+											  <label class="active" for="d3_name">user defined name </label>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="input-field">
+											  <input value="0xa12" id="d3_uid" type="text" class="validate">
+											  <label class="active" for="d3_uid">Device Unique ID</label>
+											</div>
+										</div>
+										
+										<form action="#">
+											<p>
+											  <input type="checkbox" id="hasTermos_d3" onclick='console.log(this.checked);'/>
+											  <label for="hasTermos_d3">DO NOT USE the Thermostat</label>
+											</p>
+										</form>
+										
+										<a class="btn waves-effect waves-light orange" id='conectar' 
+										   onclick="socket.emit('editar_D', JSON.stringify({'toggle': 'toggle-5','name': $('#d3_name').val(), 'uid' : $('#d3_uid').val(), 'type': 'ESP-01', 'hasTermos': $('#hasTermos_d3').prop('checked') }));">
+										   <i class="material-icons left">done</i>APPLY
+										</a>
+										
+										<a class="btn waves-effect waves-light orange"  onclick='' ><i class="material-icons left">clear</i>CANCEL</a>
+									
+									</div>
+								</span></div>
+							</li>
+							
+							<li> <!-- Device 4 -->
+								<div class="collapsible-header" name="colorTheme"><i class="material-icons">mode_edit</i>Edit device 4</div>
+								<div class="collapsible-body" ><span>
+									<div class="card-panel" name="colorTheme">
+										<span class="card-title">Smart Switch 4</span>
+										<div class="row">
+											<div class="input-field">
+											  <input value="Swith 3" id="d4_name" type="text" class="validate">
+											  <label class="active" for="d4_name">user defined name </label>
+											</div>
+										</div>
+										
+										<div class="row">
+											<div class="input-field">
+											  <input value="0xa12" id="d4_uid" type="text" class="validate">
+											  <label class="active" for="d4_uid">Device Unique ID</label>
+											</div>
+										</div>
+										
+										<form action="#">
+											<p>
+											  <input type="checkbox" id="hasTermos_d4" onclick='console.log(this.checked);'/>
+											  <label for="hasTermos_d4">DO NOT USE the Thermostat</label>
+											</p>
+										</form>
+										
+										<a class="btn waves-effect waves-light orange" id='conectar' 
+										   onclick="socket.emit('editar_D', JSON.stringify({'toggle': 'toggle-7','name': $('#d4_name').val(), 'uid' : $('#d4_uid').val(), 'type': 'ESP-01', 'hasTermos': $('#hasTermos_d4').prop('checked')}));">
+										   <i class="material-icons left">done</i>APPLY
+										</a>
+										
+										<a class="btn waves-effect waves-light orange"  onclick="$('.collapsible').collapsible('close', 3);" ><i class="material-icons left">clear</i>CANCEL</a>
+									
+									</div>
+								</span></div>
+							</li>
+						</ul>
+						
+				</div>
+			</div>
+      </div>
+    </div>
+	
+	
+
+
+</div> <!-- final div contacto-->
+
+
+
+
+
+</div> <!-- final tab pane -->
+
+
+
+<!--  Scripts-->
+  <!--<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="jquery-2.2.4.js"></script> -->
+  
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script> 
+  
+  <!-- MaterilizeCSS Compiled and minified JavaScript
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>   -->
+  
+ 
+  
+ 
+  
+  <script type="text/javascript" src="js/wickedpicker.min.js"></script>
+  
+ 
+
+
+</body>
 </html>

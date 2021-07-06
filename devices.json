@@ -1,0 +1,53 @@
+{
+	"settings": {
+		"ai": 12
+	},
+	"data": [
+		{
+			"id": 1,
+			"toggle": "toggle-1",
+			"name": "White Fan",
+			"uid": "fdf8dc",
+			"type": [
+				"ESP-01"
+			],
+			"Pin": "0",
+			"Estado": "0"
+		},
+		{
+			"id": 2,
+			"toggle": "toggle-3",
+			"name": "Water Heater",
+			"uid": "faf62",
+			"type": [
+				"ESP-01"
+			],
+			"Pin": "0",
+			"Estado": "0"
+		},
+		{
+			"id": 3,
+			"type": [
+				"ESP-01"
+			],
+			"Pin": "0",
+			"Estado": "0",
+			"toggle": "toggle-5",
+			"name": "Oil filled heater",
+			"uid": "156206",
+			"hasTermos": true
+		},
+		{
+			"id": 4,
+			"toggle": "toggle-7",
+			"name": "Fan Heater",
+			"uid": "fdf8",
+			"type": [
+				"ESP-01"
+			],
+			"Pin": "0",
+			"Estado": "0",
+			"hasTermos": true
+		}
+	]
+}
